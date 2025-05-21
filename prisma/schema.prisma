@@ -15,6 +15,15 @@ model User {
   password  String?
   createdAt DateTime @default(now())
   threads   Thread[]
+  sessions  Session[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
 }
 
 model Thread {
