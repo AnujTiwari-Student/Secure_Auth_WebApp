@@ -19,8 +19,14 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
 import { FormSuccess } from "@/components/ui/form-success";
 import { login } from "@/actions/login";
+import { useState, useTransition } from "react";
 
 export default function Login() {
+
+    const [isPending , startTransition] = useTransition();
+
+    const [error, setError] = useState<string | undefined>("")
+    const [success, setSuccess] = useState<string | undefined>("")
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -31,22 +37,20 @@ export default function Login() {
     });
 
     const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-        login(values);
-        console.log("Form values", values);
-    };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
-        console.log("Data from login", data);
-        const response = await signIn("credentials", {
-            ...data,
-            redirect: true,
-            callbackUrl: "/home",
-        });
-        console.log("Response from login", response);
-    }
+        setError("");
+        setSuccess("");
+
+        startTransition(()=>{
+            console.log("Form values", values);
+            login(values)
+              .then((res)=>{
+                setError(res.error);
+                setSuccess(res.message);
+                window.location.href = "/home";
+              })
+        })
+    };
 
     return (
       <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -70,7 +74,7 @@ export default function Login() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="exapmle@example.com" {...field} type="email" />
+                        <Input disabled={isPending} placeholder="exapmle@example.com" {...field} type="email" />
                       </FormControl>
                       {/* <FormDescription>
                         This is your public display name.
@@ -86,16 +90,16 @@ export default function Login() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input placeholder="********" {...field} type="password" />
+                        <Input disabled={isPending} placeholder="********" {...field} type="password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              <FormError message="Something went wrong!" />
-              <FormSuccess message="Logged in successfully" />
-              <Button type="submit" className="w-full">
+              <FormError message={error} />
+              <FormSuccess message={success} />
+              <Button disabled={isPending} type="submit" className="w-full">
                 Login into your Account
               </Button>
             </form>
