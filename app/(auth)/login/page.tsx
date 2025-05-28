@@ -21,8 +21,13 @@ import { FormSuccess } from "@/components/ui/form-success";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
 import { Github } from "lucide-react";
+import { redirectUrl } from "@/path_routes/route";
+import { useSearchParams } from "next/navigation";
 
 export default function Login() {
+
+    const searchParams = useSearchParams();
+    const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already linked with another provider." : undefined;
 
     const [isPending , startTransition] = useTransition();
 
@@ -52,6 +57,15 @@ export default function Login() {
               })
         })
     };
+
+    const onClick = (provider: 'google' | 'github') => {
+        signIn(provider, {
+            callbackUrl: redirectUrl,
+        }).catch((error) => {
+            console.error("Error during sign-in:", error);
+            setError("Something went wrong. Please try again.");
+        });
+    }
 
     return (
       <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -98,7 +112,7 @@ export default function Login() {
                   )}
                 />
               </div>
-              <FormError message={error} />
+              <FormError message={error || urlError} />
               <FormSuccess message={success} />
               <Button disabled={isPending} type="submit" className="w-full">
                 Login into your Account
@@ -110,7 +124,7 @@ export default function Login() {
             type="button"
             variant="outline"
             className="w-full flex items-center justify-center gap-2 mb-3"
-            onClick={() => window.location.href = "/api/auth/google"}
+            onClick={() => onClick('google')}
           >
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="200" height="200" viewBox="0 0 48 48">
@@ -123,7 +137,7 @@ export default function Login() {
             type="button"
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
-            onClick={() => window.location.href = "/api/auth/github"}
+            onClick={() => onClick('github')}
           >
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="200" height="200" viewBox="0 0 30 30">

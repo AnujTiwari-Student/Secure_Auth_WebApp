@@ -19,8 +19,13 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
 import { FormSuccess } from "@/components/ui/form-success";
 import { signup } from "@/actions/signup";
+import { redirectUrl } from "@/path_routes/route";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function Register() {
+
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof SignupSchema>>({
       resolver: zodResolver(SignupSchema),
@@ -44,7 +49,7 @@ export default function Register() {
           startTransition(() => {
             console.log("Form values", values);
             signup(values)
-              .then((res) => {
+              .then(async (res) => {
                 if (!res) {
                   setError("Something went wrong.");
                   return;
@@ -52,9 +57,19 @@ export default function Register() {
 
                 if (!res.success) {
                   setError(res.error);
+                } 
+                setSuccess(res.message);
+
+                const loginRes = await signIn("credentials", {
+                  redirect: false,
+                  email: values.email,
+                  password: values.password,
+                });
+
+                if (loginRes?.ok) {
+                  router.push(redirectUrl);
                 } else {
-                  setSuccess(res.message);
-                  window.location.href = "/home";
+                  setError("Signup succeeded but login failed.");
                 }
               });
           });

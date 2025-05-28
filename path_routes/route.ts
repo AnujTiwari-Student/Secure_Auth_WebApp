@@ -3,6 +3,7 @@ export const publicRoutes = [
     "/login",
     "/signup",
     "/logout",
+    "/error"
 ]
 
 export const protectedRoutes = [

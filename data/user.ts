@@ -27,3 +27,20 @@ export const getUserById = async (id: string) => {
         return null;
     }
 }
+
+export const updateUser = async (id:  string)=>{
+    try {
+        const user = await prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                emailVerified: new Date(),
+            }
+        });
+        return user;
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return null;
+    }
+}
