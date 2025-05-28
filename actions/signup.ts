@@ -30,6 +30,8 @@ export const signup = async (values: z.infer<typeof SignupSchema>) => {
         };
     }
 
+    const { name, email, password } = validatedFields.data;
+
     const mutation = `
         mutation CreateUser($data: UserInput!) {
             createUser(data: $data) {
@@ -42,9 +44,9 @@ export const signup = async (values: z.infer<typeof SignupSchema>) => {
     
         const variables = {
           data: {
-            name: values.name,
-            email: values.email,
-            password: values.password
+            name,
+            email,
+            password
           }
         };
     
