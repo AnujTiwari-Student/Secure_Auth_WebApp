@@ -89,7 +89,8 @@ export const signup = async (values: z.infer<typeof SignupSchema>) => {
 
         return {
             success: true,
-            message: `User ${result.data.createUser.name} created successfully!`,
+            message: `Verification Email Sent.`,
+            emailVerified: false,
         };
     
     

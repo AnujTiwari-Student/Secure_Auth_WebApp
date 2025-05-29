@@ -4,6 +4,10 @@ import * as z from "zod";
 import { signIn } from "../lib/auth";
 import { redirectUrl } from "@/path_routes/route";
 import { AuthError } from "next-auth";
+import { getUserByEmail } from "@/data/user";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
+import { getVerificationTokenByEmail } from "@/data/verificationToken";
 
 console.log("LoginSchema", LoginSchema);
 
@@ -20,6 +24,27 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     const { email, password } = validatedFields.data;
+
+    const existingUser = await getUserByEmail(email);
+
+    if (!existingUser || !existingUser.password || !existingUser.email) {
+        console.log("User not found or missing credentials");
+        return {
+            success: false,
+            error: "Something Went Wrong!",
+        };
+    }
+
+    if( !existingUser?.emailVerified){
+        console.log("Email not verified");
+        const verificationToken = await generateVerificationToken(existingUser?.email || email);
+        console.log("Verification token created:", verificationToken);
+        return {
+            success: false,
+            error: "Please verify your email before logging in",
+            emailVerified: false,
+        };
+    }
 
     try {
         await signIn("credentials", {

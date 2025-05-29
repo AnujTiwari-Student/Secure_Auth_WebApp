@@ -50,26 +50,14 @@ export default function Register() {
             console.log("Form values", values);
             signup(values)
               .then(async (res) => {
-                if (!res) {
-                  setError("Something went wrong.");
+                if (!res || !res.success) {
+                  setError(res?.error || "Something went wrong.");
                   return;
                 }
 
-                if (!res.success) {
-                  setError(res.error);
-                } 
-                setSuccess(res.message);
-
-                const loginRes = await signIn("credentials", {
-                  redirect: false,
-                  email: values.email,
-                  password: values.password,
-                });
-
-                if (loginRes?.ok) {
-                  router.push(redirectUrl);
-                } else {
-                  setError("Signup succeeded but login failed.");
+                if (!res.emailVerified) {
+                  setSuccess(res.message); 
+                  return;
                 }
               });
           });
@@ -77,6 +65,15 @@ export default function Register() {
           setError(err.message || "Something went wrong");
       }
     };
+
+    const onClick = (provider: 'google' | 'github') => {
+            signIn(provider, {
+                callbackUrl: redirectUrl,
+            }).catch((error) => {
+                console.error("Error during sign-in:", error);
+                setError("Something went wrong. Please try again.");
+            });
+        }
     
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
@@ -143,7 +140,7 @@ export default function Register() {
             type="button"
             variant="outline"
             className="w-full flex items-center justify-center gap-2 mb-3"
-            onClick={() => window.location.href = "/api/auth/google"}
+            onClick={() => onClick('google')}
           >
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="200" height="200" viewBox="0 0 48 48">
@@ -156,7 +153,7 @@ export default function Register() {
             type="button"
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
-            onClick={() => window.location.href = "/api/auth/github"}
+            onClick={() => onClick('github')}
           >
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="200" height="200" viewBox="0 0 30 30">

@@ -22,9 +22,11 @@ import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
 import { Github } from "lucide-react";
 import { redirectUrl } from "@/path_routes/route";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Login() {
+
+    const router = useRouter();
 
     const searchParams = useSearchParams();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already linked with another provider." : undefined;
@@ -50,11 +52,14 @@ export default function Login() {
         startTransition(()=>{
             console.log("Form values", values);
             login(values)
-              .then((res)=>{
-                setError(res.error);
-                setSuccess(res.message);
-                window.location.href = "/home";
-              })
+              .then(async (res) => {
+              if (!res?.success || res?.emailVerified === false) {
+                setError(res?.error || "Something went wrong");
+                return; 
+              }
+              setSuccess(res.message);
+              router.push(redirectUrl);
+            })
         })
     };
 
@@ -77,7 +82,6 @@ export default function Login() {
 
           <Form {...form}>
             <form 
-             action=""
              onSubmit={form.handleSubmit(onSubmit)} 
              className="space-y-6"
             >

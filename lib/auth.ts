@@ -14,6 +14,21 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
     },
     callbacks: {
+        async signIn({ user, account, profile }) {
+            console.log("Sign In Callback", { user, account, profile });
+            if(account?.provider !== "credentials") return true;
+            const userId = user.id as unknown as string;
+            if(!userId) {
+                console.error("User ID is missing during sign-in");
+                return false;
+            }
+            const existingUser = await getUserById(userId);
+            if(!existingUser || !existingUser.email || !existingUser.password || !existingUser.emailVerified) {
+                console.error("Something Went Wrong", { existingUser });
+                return false;
+            }
+            return true;
+        },
         async session({ session, token }) {
             if(token.sub && session.user){
                 session.user.id = token.sub; 
