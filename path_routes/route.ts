@@ -3,7 +3,9 @@ export const publicRoutes = [
     "/login",
     "/signup",
     "/logout",
-    "/error"
+    "/error",
+    "/newVerification",
+    "/resetPassword",
 ]
 
 export const protectedRoutes = [

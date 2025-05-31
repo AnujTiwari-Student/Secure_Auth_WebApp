@@ -5,7 +5,7 @@ export const sendVerificationEmail = async (email: string | undefined , token: s
 
     if (!email || !token) return;
 
-    const verifyUrl = `${process.env.NEXT_PUBLIC_API_URL}/auth/newVerification?token=${token}`;
+    const verifyUrl = `${process.env.NEXT_PUBLIC_API_URL}/newVerification?token=${token}`;
     const htmlContent = verificationEmailHtml(verifyUrl)
 
     // const transporter = nodemailer.createTransport({

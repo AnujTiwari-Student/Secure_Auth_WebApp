@@ -59,6 +59,7 @@ export default function Register() {
                   setSuccess(res.message); 
                   return;
                 }
+
               });
           });
       } catch (err: any) {

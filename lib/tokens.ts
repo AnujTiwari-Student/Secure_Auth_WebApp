@@ -8,8 +8,6 @@ const ALGORITHM = 'RS256'
 const privateJwk = JSON.parse(process.env.JWT_PRIVATE_KEY!)
 const publicJwk = JSON.parse(process.env.JWT_PUBLIC_KEY!)
 
-var expires = new Date(new Date().getTime() + 3600 * 1000)
-
 export const generateVerificationToken = async (email: string) => {
 
     if (!privateJwk || !publicJwk) {
@@ -42,6 +40,8 @@ export const generateVerificationToken = async (email: string) => {
             .sign(privateKey)
 
         console.log("Generated verification token:", token);
+
+        const expires = new Date(Date.now() + 60 * 60 * 1000);
 
         const verificationToken = await prisma.verificationToken.create({
             data: {

@@ -25,7 +25,7 @@ import { redirectUrl } from "@/path_routes/route";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function Login() {
+const ResetPassword = () => {
 
     const router = useRouter();
 
@@ -103,7 +103,7 @@ export default function Login() {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
@@ -120,17 +120,17 @@ export default function Login() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
               <FormError message={error || urlError} />
               <FormSuccess message={success} />
               <Button disabled={isPending} type="submit" className="w-full">
-                Login into your Account
+                Send Reset Link
               </Button>
             </form>
           </Form>
           <div>
-          <Button
+          {/* <Button
             type="button"
             variant="outline"
             className="w-full flex items-center justify-center gap-2 mb-3"
@@ -155,13 +155,12 @@ export default function Login() {
               </svg>
             </span>
             Continue with GitHub
-          </Button>
+          </Button> */}
         </div>
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
-              <a href="/signup" className="text-blue-600 hover:underline">
-                Sign up
+              <a href="/login" className="text-black hover:underline">
+                Back to login
               </a>
             </p>
           </div>
@@ -169,3 +168,5 @@ export default function Login() {
       </div>
     );
   }
+
+  export default ResetPassword;
