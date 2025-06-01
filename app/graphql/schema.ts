@@ -20,6 +20,11 @@ export const typeDefs = gql`#graphql
     email: String!
     password: String!
   }
+
+  input UpdatePasswordInput {
+    newPassword: String!
+    confirmPassword: String!
+   }
   
   type Thread {
     id: ID!
@@ -31,8 +36,22 @@ export const typeDefs = gql`#graphql
     updatedAt: String
   }
 
+  type EmailVerificationResponse {
+    success: Boolean!
+    message: String
+    error: String
+  }
+
+  type ResetPasswordResponse {
+    success: Boolean!
+    message: String
+    error: String
+  }
+
    type Mutation {
-    createUser(data: UserInput!): User
+    createUser(data: UserInput!): User!
+    emailVerification(token: String!): EmailVerificationResponse!
+    resetPassword(token: String! , data: UpdatePasswordInput!): ResetPasswordResponse!
    }
   
   `

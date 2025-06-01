@@ -38,6 +38,14 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     if( !existingUser?.emailVerified){
         console.log("Email not verified");
         const verificationToken = await generateVerificationToken(existingUser?.email || email);
+        if (!verificationToken || typeof verificationToken.token !== "string") {
+            console.error("Failed to generate verification token.");
+            return {
+                success: false,
+                error: "Failed to generate verification token.",
+            };
+        }
+        await sendVerificationEmail(existingUser.email, verificationToken.token);
         console.log("Verification token created:", verificationToken);
         return {
             success: false,

@@ -1,7 +1,9 @@
+import { ResetPasswordToken } from './../node_modules/.prisma/client/index.d';
 import { getVerificationTokenByEmail } from '@/data/verificationToken'
 import { SignJWT, jwtVerify, importJWK } from 'jose'
 import { prisma } from "../lib/prisma"
 import { sendVerificationEmail } from './mail'
+import { getResetPassTokenByEmail } from '@/data/resetPassToken'
 
 const ALGORITHM = 'RS256'
 
@@ -51,8 +53,8 @@ export const generateVerificationToken = async (email: string) => {
             },
         })
 
-        await sendVerificationEmail(email, token);
-        console.log("Verification email sent to:", email);
+        // await sendVerificationEmail(email, token);
+        // console.log("Verification email sent to:", email);
 
         return verificationToken;
 
@@ -60,6 +62,58 @@ export const generateVerificationToken = async (email: string) => {
         console.error("Error generating verification token:", error);
         return null;
     }
+}
+
+export const generatePasswordResetToken = async (email: string) => {
+     if (!privateJwk || !publicJwk) {
+        throw new Error("JWT keys are not defined in the environment variables.");
+    }
+
+    if (!email) {
+        throw new Error("Email is required to generate a verification token.");
+    }
+
+    try {
+        const existingToken = await getResetPassTokenByEmail(email);
+
+        if (existingToken) {
+            await prisma.resetPasswordToken.delete({
+                where: {
+                    identifier: existingToken.identifier,
+                },
+            });
+        }
+
+        const privateKey = await importJWK(privateJwk, ALGORITHM)
+
+        const token = await new SignJWT({email})
+            .setProtectedHeader({ alg: ALGORITHM })
+            .setIssuedAt()
+            .setExpirationTime('1h') 
+            .sign(privateKey)
+
+        const expires = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+
+        const resetPassToken = await prisma.resetPasswordToken.create({
+            data: {
+                token,
+                email,
+                expires
+            },
+        })
+
+        return {
+            token: resetPassToken.token,
+            expires: resetPassToken.expires,
+            email: resetPassToken.email,
+            identifier: resetPassToken.identifier
+        }
+         
+    } catch (error) {
+        console.error("Error generating reset password token:", error);
+        return null;
+    }
+
 }
 
 export const verifyVerificationToken = async (token: string) => {

@@ -12,7 +12,7 @@ import{
   FormMessage,
   FormDescription
 } from "../../../components/ui/form";
-import { ResetSchema } from "@/schemas";
+import { NewPasswordSchema } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
@@ -21,39 +21,52 @@ import { useState, useTransition } from "react";
 import { redirectUrl } from "@/path_routes/route";
 import Link from "next/link";
 import { passwordReset } from "@/actions/passwordReset";
+import { useRouter, useSearchParams } from "next/navigation";
+import { newPasswordSubmission } from "@/actions/newPasswordSubmission";
 
-const ResetPassword = () => {
+const ResetPasswordForm = () => {
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const token = searchParams.get("token");
 
     const [isPending , startTransition] = useTransition();
 
     const [error, setError] = useState<string | undefined>("")
     const [success, setSuccess] = useState<string | undefined>("")
 
-    const form = useForm<z.infer<typeof ResetSchema>>({
-        resolver: zodResolver(ResetSchema),
+    const form = useForm<z.infer<typeof NewPasswordSchema>>({
+        resolver: zodResolver(NewPasswordSchema),
         defaultValues: {
-            email: ""
+            password: "",
+            passwordConfirmation: ""
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof ResetSchema>) => {
+    const onSubmit = async (values: z.infer<typeof NewPasswordSchema>) => {
 
         setError("");
         setSuccess("");
 
+        if(!token){
+            setError("Invalid token")
+            return;
+        }
+
         startTransition(()=>{
             console.log("Form values", values)
-            passwordReset(values)
+            newPasswordSubmission(token , values)
               .then(async (res) => {
-                if (!res?.success) {
-                    setError(res?.error || "Something went wrong");
-                    return; 
+                if (res.success) {
+                    setSuccess("Password reset successful.")
+                    router.push("/login")
+                } else {
+                    setError("Something went wrong.")
                 }
-                setSuccess(res?.message || "Password reset link sent successfully");
-                console.log("Password reset link sent successfully", res);
               }).catch((err) => {
-                console.error("Error sending password reset link:", err);
+                console.error("Error updating password:", err);
                 setError(err.message || "Something went wrong.");
+            
             })
         })
     };
@@ -63,7 +76,7 @@ const ResetPassword = () => {
         <div className="w-full max-w-md px-6 py-12 space-y-8 bg-white rounded-lg shadow-md sm:px-10">
           
           <div className="text-center">
-            <h1 className="text-4xl font-bold">Login</h1>
+            <h1 className="text-4xl font-bold">Reset Password</h1>
           </div>
 
           <Form {...form}>
@@ -74,15 +87,28 @@ const ResetPassword = () => {
               <div className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Your Mail</FormLabel>
+                      <FormLabel>New Password</FormLabel>
                       <FormControl>
-                        <Input disabled={isPending} placeholder="exapmle@example.com" {...field} type="email" />
+                        <Input disabled={isPending} placeholder="********" {...field} type="password" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="passwordConfirmation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input disabled={isPending} placeholder="********" {...field} type="password" />
                       </FormControl>
                       <FormDescription>
-                        Enter same email you used to register.
+                        Make sure it's same as new password
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -92,7 +118,7 @@ const ResetPassword = () => {
               <FormError message={error} />
               <FormSuccess message={success} />
               <Button disabled={isPending} type="submit" className="w-full">
-                Send Reset Link
+                Change Password
               </Button>
             </form>
           </Form>
@@ -110,4 +136,4 @@ const ResetPassword = () => {
     );
   }
 
-  export default ResetPassword;
+  export default ResetPasswordForm;

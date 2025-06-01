@@ -96,9 +96,6 @@ export default function Login() {
                       <FormControl>
                         <Input disabled={isPending} placeholder="exapmle@example.com" {...field} type="email" />
                       </FormControl>
-                      {/* <FormDescription>
-                        This is your public display name.
-                      </FormDescription> */}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -160,9 +157,9 @@ export default function Login() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
-              <a href="/signup" className="text-blue-600 hover:underline">
+              <Link href="/signup" className="text-blue-600 hover:underline">
                 Sign up
-              </a>
+              </Link>
             </p>
           </div>
         </div>

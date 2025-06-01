@@ -6,6 +6,7 @@ export const publicRoutes = [
     "/error",
     "/newVerification",
     "/resetPassword",
+    "/pass-reset"
 ]
 
 export const protectedRoutes = [

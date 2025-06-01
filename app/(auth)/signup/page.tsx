@@ -22,6 +22,7 @@ import { signup } from "@/actions/signup";
 import { redirectUrl } from "@/path_routes/route";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 export default function Register() {
 
@@ -126,6 +127,9 @@ export default function Register() {
                     <FormControl>
                       <Input disabled={isPending} type="password" {...field} placeholder="********" />
                     </FormControl>
+                    <FormDescription className="text-xs">
+                      Password must be at least 8 characters long.
+                    </FormDescription>
                     <FormError />
                   </FormItem>
                 )}
@@ -167,9 +171,9 @@ export default function Register() {
         <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <a href="/login" className="text-blue-600 hover:underline">
+              <Link href="/login" className="text-blue-600 hover:underline">
                   Login
-              </a>
+              </Link>
             </p>
           </div>
       </div>
