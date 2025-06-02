@@ -53,9 +53,6 @@ export const generateVerificationToken = async (email: string) => {
             },
         })
 
-        // await sendVerificationEmail(email, token);
-        // console.log("Verification email sent to:", email);
-
         return verificationToken;
 
     } catch (error) {
@@ -65,6 +62,7 @@ export const generateVerificationToken = async (email: string) => {
 }
 
 export const generatePasswordResetToken = async (email: string) => {
+
      if (!privateJwk || !publicJwk) {
         throw new Error("JWT keys are not defined in the environment variables.");
     }
@@ -112,6 +110,58 @@ export const generatePasswordResetToken = async (email: string) => {
     } catch (error) {
         console.error("Error generating reset password token:", error);
         return null;
+    }
+
+}
+
+export const generateTwoFactorToken = async (email: string) => {
+
+    if (!privateJwk || !publicJwk) {
+        throw new Error("JWT keys are not defined in the environment variables.");
+    }
+
+    if (!email) {
+        throw new Error("Email is required to generate a verification token.");
+    }
+
+    try {
+        const existingToken = await prisma.twoFactorToken.findFirst({
+            where: {
+                email,
+            },
+        });
+
+        if (existingToken) {
+            await prisma.twoFactorToken.delete({
+                where: {
+                    id: existingToken.id,
+                },
+            });
+        }
+
+        const privateKey = await importJWK(privateJwk, ALGORITHM)
+
+        const token = await new SignJWT({email})
+            .setProtectedHeader({ alg: ALGORITHM })
+            .setIssuedAt()
+            .setExpirationTime('1h') 
+            .sign(privateKey)
+
+        const expires = new Date(Date.now() + 3600 * 1000);
+
+        const twoFactorToken = await prisma.twoFactorToken.create({
+            data: {
+                email,
+                token,
+                expires,
+            },
+        });
+
+        return twoFactorToken
+        
+    } catch (error) {
+        console.error("Error generating verification token:", error);
+        return null;  
     }
 
 }
