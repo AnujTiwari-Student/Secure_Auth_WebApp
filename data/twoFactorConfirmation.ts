@@ -5,7 +5,7 @@ export const getTwoFactorConfirmationById = async (userId: string) => {
     try {
         const twoFactorConfirmation = await prisma.twoFactorConfirmation.findUnique({
             where: {
-                id: userId
+                userId
             }
         });
         return twoFactorConfirmation;

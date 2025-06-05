@@ -52,6 +52,7 @@ export const typeDefs = gql`#graphql
     createUser(data: UserInput!): User!
     emailVerification(token: String!): EmailVerificationResponse!
     resetPassword(token: String! , data: UpdatePasswordInput!): ResetPasswordResponse!
+    twoFactorAuthentication(token: String!): EmailVerificationResponse!
    }
   
   `

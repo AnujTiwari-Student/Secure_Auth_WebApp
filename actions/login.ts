@@ -5,9 +5,12 @@ import { signIn } from "../lib/auth";
 import { redirectUrl } from "@/path_routes/route";
 import { AuthError } from "next-auth";
 import { getUserByEmail } from "@/data/user";
-import { generateVerificationToken } from "@/lib/tokens";
-import { sendVerificationEmail } from "@/lib/mail";
+import { generateTwoFactorToken, generateVerificationToken } from "@/lib/tokens";
+import { sendTwoFactorEmail, sendVerificationEmail } from "@/lib/mail";
 import { getVerificationTokenByEmail } from "@/data/verificationToken";
+import { getTwoFactorTokenByEmail } from "@/data/twoFactorToken";
+import prisma from "@/lib/prisma"
+import { getTwoFactorConfirmationById } from "@/data/twoFactorConfirmation";
 
 console.log("LoginSchema", LoginSchema);
 
@@ -23,7 +26,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
         };
     }
 
-    const { email, password } = validatedFields.data;
+    const { email, password , code } = validatedFields.data;
 
     const existingUser = await getUserByEmail(email);
 
@@ -52,6 +55,63 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             error: "Please verify your email before logging in",
             emailVerified: false,
         };
+    }
+
+    if(existingUser.isTwoFactorEnabled && existingUser.email){
+
+        if(code){
+
+            const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
+
+            if(!twoFactorToken){
+                return { success: false , error: "Invalid Code!" };
+            }
+
+            if(twoFactorToken.token !== code){
+                return { success: false , error: "Invalid Code!" };
+            }
+
+            const hasExpired = new Date(twoFactorToken.expires) < new Date()
+
+            if(hasExpired){
+                return { success: false , error: "Verification token has expired" };
+            }
+
+            await prisma?.twoFactorToken.delete({
+                where: {
+                    id: twoFactorToken.id,
+                },
+            })
+
+            const existingConfirmation = await getTwoFactorConfirmationById(existingUser.id);
+
+            if(existingConfirmation){
+                await prisma?.twoFactorConfirmation.delete({
+                    where: {
+                        id: existingConfirmation.id,
+                    },
+                })
+            }
+
+            const newConfirmation = await prisma.twoFactorConfirmation.create({
+                data: {
+                    userId: existingUser.id
+                },
+            })
+
+            console.log("Two factor confirmed" , newConfirmation);
+
+        } else {
+
+            const twoFactorToken = await generateTwoFactorToken(existingUser.email);
+            await sendTwoFactorEmail(twoFactorToken?.email, twoFactorToken?.token);
+
+            console.log("Two factor token created:", twoFactorToken);
+            console.log("twoFactor");
+
+            return { success: true , twoFactor: true }
+
+        }        
     }
 
     try {

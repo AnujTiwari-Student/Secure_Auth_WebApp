@@ -24,14 +24,19 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 return false;
             }
             const existingUser = await getUserById(userId);
-            if(!existingUser || !existingUser.email || !existingUser.password || !existingUser.emailVerified) {
-                console.error("Something Went Wrong", { existingUser });
-                return false;
-            }
+            if(!existingUser || !existingUser?.emailVerified) return false;
+
+            console.log("Existing User", existingUser);
 
             if(existingUser.isTwoFactorEnabled){
                 const twoFactorConfirmation = await getTwoFactorConfirmationById(existingUser.id);
                 if(!twoFactorConfirmation) return false;
+
+                await prisma.twoFactorConfirmation.delete({
+                    where: {
+                        id: twoFactorConfirmation.id
+                    }
+                })
             }
 
             return true;

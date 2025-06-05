@@ -5,6 +5,7 @@ import { generateVerificationToken } from "@/lib/tokens";
 import { getVerificationTokenByEmail, getVerificationTokenByToken } from "@/data/verificationToken";
 import { sendVerificationEmail } from "@/lib/mail";
 import { getResetPassTokenByToken } from "@/data/resetPassToken";
+import { getTwoFactorTokenByToken } from "@/data/twoFactorToken";
 
 
 export const resolvers = {
@@ -195,22 +196,52 @@ export const resolvers = {
             }
         },
         twoFactorAuthentication: async(_: any , args: {token: string}) => {
-            // const { token } = args;
-            // if (!token) {
-            //     throw new Error("Token is required for 2FA");
-            // }
-            // const user = await getUserByToken(token);
-            // if (!user) {
-            //     console.error("User not found.");
-            //     return {
-            //         success: false,
-            //         error: "User not found",
-            //     };
-            // }
-            // return {
-            //     success: true,
-            //     message: "2FA enabled successfully",
-            // }   
+            const { token } = args;
+            if (!token) {
+                throw new Error("Token is required for 2FA");
+            }
+            const twoFactorToken = await getTwoFactorTokenByToken(token);
+
+            if (!twoFactorToken) {
+                console.error("Verification token not found");
+                return {
+                    success: false,
+                    error: "Invalid or expired verification token",
+                };
+            }
+
+            const user = await getUserByEmail(twoFactorToken.email);
+            if (!user) {
+                console.error("User not found.");
+                return {
+                    success: false,
+                    error: "User not found",
+                };
+            }
+
+            const hasExpired = new Date(twoFactorToken.expires) < new Date();
+
+            if (hasExpired) {
+                console.error("Verification token has expired");
+                return {
+                    success: false,
+                    error: "Verification token has expired",
+                };
+            }
+
+            const updatedUser = await prisma.user.update({
+                where: {
+                    id: user.id,
+                },
+                data: {
+                    isTwoFactorEnabled: true,
+                },
+            })
+
+            return {
+                success: true,
+                message: "2FA mail sent successfully",
+            }   
         }
     }
 }
