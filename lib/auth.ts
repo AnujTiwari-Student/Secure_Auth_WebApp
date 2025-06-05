@@ -3,6 +3,7 @@ import authConfig from "./auth.config"
 import { prisma } from "./prisma"
 import { getUserById, updateUser } from '@/data/user';
 import NextAuth, { type DefaultSession } from "next-auth"
+import { getTwoFactorConfirmationById } from '@/data/twoFactorConfirmation';
  
 export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig,
@@ -27,6 +28,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 console.error("Something Went Wrong", { existingUser });
                 return false;
             }
+
+            if(existingUser.isTwoFactorEnabled){
+                const twoFactorConfirmation = await getTwoFactorConfirmationById(existingUser.id);
+                if(!twoFactorConfirmation) return false;
+            }
+
             return true;
         },
         async session({ session, token }) {

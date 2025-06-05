@@ -1,4 +1,4 @@
-import { passwordResetEmailHtml, verificationEmailHtml } from '@/utils/verificationEmail';
+import { passwordResetEmailHtml, twoFactorEmailTemplate, verificationEmailHtml } from '@/utils/verificationEmail';
 import nodemailer from 'nodemailer';
 
 export const sendVerificationEmail = async (email: string | undefined , token: string | undefined) => {
@@ -78,5 +78,34 @@ export const sendPasswordResetEmail = async (email: string | undefined, token: s
     } catch (err) {
         console.error("Error sending password reset email:", err);
     }
+}
+
+export const sendTwoFactorEmail = async (email: string | undefined, token: string | undefined) => {
+    if (!email || !token) return;
+
+    const htmlContent = twoFactorEmailTemplate(token);
+
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_APP_PASSWORD,
+        },
+    });
+
+    try {
+        const info = await transporter.sendMail({
+            from: `"Auth App@verify 2fa" <${process.env.GMAIL_USER}>`,
+            to: email,
+            subject: "2FA Verification",
+            html: htmlContent,
+        });
+
+        console.log("Password reset email sent:", info.messageId);
+        console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
+    } catch (err) {
+        console.error("Error sending password reset email:", err);
+    }
+
 }
 

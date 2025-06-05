@@ -4,6 +4,8 @@ import { SignJWT, jwtVerify, importJWK } from 'jose'
 import { prisma } from "../lib/prisma"
 import { sendVerificationEmail } from './mail'
 import { getResetPassTokenByEmail } from '@/data/resetPassToken'
+import crypto from 'crypto'
+import { getTwoFactorTokenByEmail } from '@/data/twoFactorToken';
 
 const ALGORITHM = 'RS256'
 
@@ -116,53 +118,28 @@ export const generatePasswordResetToken = async (email: string) => {
 
 export const generateTwoFactorToken = async (email: string) => {
 
-    if (!privateJwk || !publicJwk) {
-        throw new Error("JWT keys are not defined in the environment variables.");
-    }
+    const token = crypto.randomInt(100000, 999999).toString()
+    const expires = new Date(Date.now() + 10 * 60 * 1000); 
 
-    if (!email) {
-        throw new Error("Email is required to generate a verification token.");
-    }
+    const existingToken = await getTwoFactorTokenByEmail(email);
 
-    try {
-        const existingToken = await prisma.twoFactorToken.findFirst({
+    if(existingToken){
+        await prisma.twoFactorToken.delete({
             where: {
-                email,
+                id: existingToken.id,
             },
         });
-
-        if (existingToken) {
-            await prisma.twoFactorToken.delete({
-                where: {
-                    id: existingToken.id,
-                },
-            });
-        }
-
-        const privateKey = await importJWK(privateJwk, ALGORITHM)
-
-        const token = await new SignJWT({email})
-            .setProtectedHeader({ alg: ALGORITHM })
-            .setIssuedAt()
-            .setExpirationTime('1h') 
-            .sign(privateKey)
-
-        const expires = new Date(Date.now() + 3600 * 1000);
-
-        const twoFactorToken = await prisma.twoFactorToken.create({
-            data: {
-                email,
-                token,
-                expires,
-            },
-        });
-
-        return twoFactorToken
-        
-    } catch (error) {
-        console.error("Error generating verification token:", error);
-        return null;  
     }
+
+    const twoFactorToken = await prisma.twoFactorToken.create({
+        data: {
+            token,
+            email,
+            expires
+        },
+    })
+
+    return twoFactorToken
 
 }
 

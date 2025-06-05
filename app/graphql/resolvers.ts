@@ -193,6 +193,24 @@ export const resolvers = {
                 success: true,
                 message: "Password reset successfully",
             }
+        },
+        twoFactorAuthentication: async(_: any , args: {token: string}) => {
+            // const { token } = args;
+            // if (!token) {
+            //     throw new Error("Token is required for 2FA");
+            // }
+            // const user = await getUserByToken(token);
+            // if (!user) {
+            //     console.error("User not found.");
+            //     return {
+            //         success: false,
+            //         error: "User not found",
+            //     };
+            // }
+            // return {
+            //     success: true,
+            //     message: "2FA enabled successfully",
+            // }   
         }
     }
 }

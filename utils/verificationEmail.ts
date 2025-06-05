@@ -61,3 +61,25 @@ export const passwordResetEmailHtml = (resetUrl: string) => {
     </div>
   `
 }
+
+export const twoFactorEmailTemplate = (token: string) => {
+  return `
+    <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+      <h2 style="color: #2c3e50;">Two-Factor Authentication Code</h2>
+      <p>Hello,</p>
+      <p>Your two-factor authentication code is:</p>
+
+      <p style="margin: 20px 0; font-size: 24px; font-weight: bold; text-align: center; background-color: #f5f5f5; padding: 10px; border-radius: 5px;">${token}
+      </p>
+
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+
+      <p style="font-size: 14px; color: #555;">
+        If you didn’t request this email, you can safely ignore it.
+      </p>
+      <p style="font-size: 14px; color: #555;">
+        Need help? Contact us at <a href="mailto:support@anujtiwari.dev">support@anujtiwari.dev</a>
+      </p>
+    </div>
+  `
+}
