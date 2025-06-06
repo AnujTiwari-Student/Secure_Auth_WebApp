@@ -1,6 +1,6 @@
 import { logout } from "@/actions/logout";
 import { LogoutButton } from "../../../components/LogoutButton";
-import User from "@/hooks/userHook";
+import {currentUser} from "@/lib/userInfo";
 import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -10,7 +10,7 @@ export default async function Home() {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  const user = await User();
+  const user = await currentUser();
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center">
@@ -18,7 +18,8 @@ export default async function Home() {
       <p className=""><strong>Email:</strong> {user?.email}</p>
       <p className=""><strong>User ID:</strong> {user?.id}</p>
       <p className=""><strong>Role:</strong> {capitalizeFirstLetter(user?.role)}</p>
-      <p className=""><strong>Image:</strong> {user?.image || ""}</p>
+      <p className=""><strong>Image:</strong> {user?.image || "Upload Please"}</p>
+      <p className=""><strong>2FA:</strong> {user?.isTwoFactorEnabled === true ? "Enabled" : "Disabled"}</p>
     </div>
   )
 }

@@ -1,21 +1,15 @@
-import { auth } from "@/lib/auth";
+"use client";
 
-const SettingPage = async () => {
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-    const session = await auth();
-    if (!session || !session.user) {
-        return (
-            <div className="flex flex-col items-center justify-center h-full">
-                <h1 className="text-2xl font-bold mb-4">Settings Page</h1>
-                <p className="text-gray-600">You are not logged in.</p>
-            </div>
-        );
-    }
+const SettingPage = () => {
+
+    const user = useCurrentUser();
     
     return (
         <div className="flex flex-col items-center justify-center h-full">
             <h1 className="text-2xl font-bold mb-4">Settings Page</h1>
-            <p className="text-gray-600">This is the settings page.</p>
+            <p className="text-gray-600">{JSON.stringify(user)}</p>
         </div>
     );
 }

@@ -36,6 +36,7 @@ export const updateUser = async (id:  string)=>{
             },
             data: {
                 emailVerified: new Date(),
+                isTwoFactorEnabled: true,
             }
         });
         return user;

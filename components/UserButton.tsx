@@ -11,7 +11,6 @@ import {
     AvatarFallback,
     AvatarImage,
   } from "@/components/ui/avatar";
-import currentUser from "@/hooks/userHook";
 import { LogoutButton } from "./LogoutButton";
 import { LogOut, ShieldCheck } from "lucide-react";
 
