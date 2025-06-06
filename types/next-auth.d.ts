@@ -10,6 +10,9 @@ declare module "next-auth" {
     user: {
       role: ExtendedUser['role'];
       name: string;
+      email: string;
+      image: string;
+      id: string;
     }
   }
 }
