@@ -1,7 +1,6 @@
 "use client";
 import { SignupSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -11,7 +10,6 @@ import{
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
   FormDescription
 } from "../../../components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -20,13 +18,10 @@ import { FormError } from "@/components/ui/form-error";
 import { FormSuccess } from "@/components/ui/form-success";
 import { signup } from "@/actions/signup";
 import { redirectUrl } from "@/path_routes/route";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
 export default function Register() {
-
-    const router = useRouter();
 
     const form = useForm<z.infer<typeof SignupSchema>>({
       resolver: zodResolver(SignupSchema),
@@ -63,9 +58,13 @@ export default function Register() {
 
               });
           });
-      } catch (err: any) {
-          setError(err.message || "Something went wrong");
-      }
+      } catch (err: unknown) {
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("Something went wrong");
+          }
+        }
     };
 
     const onClick = (provider: 'google' | 'github') => {

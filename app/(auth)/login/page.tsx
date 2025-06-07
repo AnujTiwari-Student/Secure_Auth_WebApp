@@ -11,7 +11,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "../../../components/ui/form";
 import { LoginSchema } from "@/schemas";
 import { Input } from "@/components/ui/input";
@@ -20,13 +19,11 @@ import { FormError } from "@/components/ui/form-error";
 import { FormSuccess } from "@/components/ui/form-success";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
-import { Github } from "lucide-react";
 import { redirectUrl } from "@/path_routes/route";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function Login() {
-  const router = useRouter();
 
   const searchParams = useSearchParams();
   const urlError =
@@ -73,10 +70,6 @@ export default function Login() {
             setSuccess(res.message);
           }
         })
-        // .catch((err) => {
-        //   console.error("Error logging in:", err);
-        //   setError(err.message || "Something went wrong.");
-        // });
     });
   };
 
@@ -237,7 +230,7 @@ export default function Login() {
         </div>
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
+            Dont have an account?{" "}
             <Link href="/signup" className="text-blue-600 hover:underline">
               Sign up
             </Link>

@@ -18,9 +18,7 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
 import { FormSuccess } from "@/components/ui/form-success";
 import { useState, useTransition } from "react";
-import { redirectUrl } from "@/path_routes/route";
 import Link from "next/link";
-import { passwordReset } from "@/actions/passwordReset";
 import { useRouter, useSearchParams } from "next/navigation";
 import { newPasswordSubmission } from "@/actions/newPasswordSubmission";
 
@@ -108,7 +106,7 @@ const ResetPasswordForm = () => {
                         <Input disabled={isPending} placeholder="********" {...field} type="password" />
                       </FormControl>
                       <FormDescription>
-                        Make sure it's same as new password
+                        Make sure its same as new password
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

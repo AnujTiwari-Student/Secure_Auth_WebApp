@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
 import { FormSuccess } from "@/components/ui/form-success";
 import { useState, useTransition } from "react";
-import { redirectUrl } from "@/path_routes/route";
 import Link from "next/link";
 import { passwordReset } from "@/actions/passwordReset";
 

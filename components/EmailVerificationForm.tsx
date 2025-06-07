@@ -2,16 +2,13 @@
 
 import { BeatLoader } from "react-spinners"
 import { CardWrapper } from "./CardWrapper";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { verifyEmail } from "@/actions/emailVerification";
 import { FormError } from "./ui/form-error";
 import { FormSuccess } from "./ui/form-success";
-import { redirectUrl } from "@/path_routes/route";
 
 export const EmailVerificationForm = () => {
-
-    const router = useRouter();
 
     const searchParams = useSearchParams();
     const token = searchParams.get("token");

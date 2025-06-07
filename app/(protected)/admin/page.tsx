@@ -1,27 +1,40 @@
 "use client";
 
+import { admin } from "@/actions/admin";
 import { RoleGate } from "@/components/roleGate";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { FormSuccess } from "@/components/ui/form-success";
 import { UserRole } from "@prisma/client";
+import { toast } from "sonner";
 
 const AdminPage = () => {
+
+  const onServerRouteClick = () => {
+    admin()
+      .then((res)=>{
+        if (res.success) {
+          toast.success(res.success);
+          console.log("Success")
+        }else{
+          toast.error(res.error);
+          console.log("Error")
+        }
+      })
+  }
 
   const onApiRouteClick = () => {
     fetch('/api/admin', {method: 'GET'})
       .then((res)=>{
         if (res.ok) {
+          toast.success("Success");
           console.log("Success")
         }else{
+          toast.error("Error");
           console.log("Error")
         }
       })
@@ -48,7 +61,7 @@ const AdminPage = () => {
             <p>
               Admin-only Server Action
             </p>
-            <Button>
+            <Button onClick={onServerRouteClick}>
               Click to test!
             </Button>
         </div>

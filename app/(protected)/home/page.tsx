@@ -1,8 +1,4 @@
-import { logout } from "@/actions/logout";
-import { LogoutButton } from "../../../components/LogoutButton";
 import {currentUser} from "@/lib/userInfo";
-import { auth, signOut } from "@/lib/auth";
-import { redirect } from "next/navigation";
 
 export default async function Home() {
 
@@ -14,6 +10,7 @@ export default async function Home() {
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center">
+      <h1 className="text-2xl font-bold mb-4">Home Page</h1>
       <p className=""><strong>Name:</strong> {user?.name}</p>
       <p className=""><strong>Email:</strong> {user?.email}</p>
       <p className=""><strong>User ID:</strong> {user?.id}</p>

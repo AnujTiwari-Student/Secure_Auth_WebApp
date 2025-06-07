@@ -1,5 +1,34 @@
 
+import { UserRole } from "@prisma/client";
 import * as z from "zod";
+
+export const SettingsSchema = z.object({
+  name: z.string().optional(),
+  isTwoFactorEnabled: z.boolean().optional(),
+  email: z.string().email().optional(),
+  image: z.string().optional(),
+  password: z.string().optional(),
+  newPassword: z.string().min(8, "Password must be at least 8 characters long").optional(),
+  role: z.enum([UserRole.user, UserRole.admin]).optional()
+})
+  .refine((data) => {
+    if (data.password && !data.newPassword) {
+      return false;
+    }
+    return true;
+  },{
+    message: "New password is required",
+    path: ["newPassword"]
+  })
+  .refine((data) => {
+    if (data.newPassword && !data.password) {
+      return false;
+    }
+    return true;
+  },{
+    message: "Password is required",
+    path: ["password"]
+  });
 
 export const LoginSchema = z.object({
   email: z.string().email({

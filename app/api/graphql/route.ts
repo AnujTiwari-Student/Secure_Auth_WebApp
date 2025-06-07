@@ -1,23 +1,22 @@
-import { startServerAndCreateNextHandler } from "@as-integrations/next";
-import { ApolloServer } from "@apollo/server";
-import { typeDefs } from "../../graphql/schema";
-import { resolvers } from "../../graphql/resolvers";
-import { auth } from "../../../lib/auth";
-// import { getServerSession } from "next-auth";
-import { NextRequest } from "next/server";
+import { startServerAndCreateNextHandler } from '@as-integrations/next';
+import { ApolloServer } from '@apollo/server';
+import { resolvers } from '@/app/graphql/resolvers';
+import { typeDefs } from '@/app/graphql/schema';
+import { NextRequest } from 'next/server';
 
 const server = new ApolloServer({
-  typeDefs,
   resolvers,
+  typeDefs,
 });
 
 const handler = startServerAndCreateNextHandler<NextRequest>(server, {
-  context: async (req: NextRequest) => {
-    console.log("GraphQL API hit");
-    const session = await auth();
-    console.log("Session in GraphQL API", session);
-    return { session };
-  },
+  context: async () => ({})
 });
 
-export { handler as GET, handler as POST };
+export async function POST(request: NextRequest) {
+  return handler(request);
+}
+
+export async function GET(request: NextRequest) {
+  return handler(request);
+}

@@ -1,8 +1,6 @@
-import { ResetPasswordToken } from './../node_modules/.prisma/client/index.d';
 import { getVerificationTokenByEmail } from '@/data/verificationToken'
 import { SignJWT, jwtVerify, importJWK } from 'jose'
 import { prisma } from "../lib/prisma"
-import { sendVerificationEmail } from './mail'
 import { getResetPassTokenByEmail } from '@/data/resetPassToken'
 import crypto from 'crypto'
 import { getTwoFactorTokenByEmail } from '@/data/twoFactorToken';

@@ -2,7 +2,7 @@ import { getUserByEmail } from "@/data/user";
 import {prisma} from "../../lib/prisma"
 import bcrypt from "bcryptjs";
 import { generateVerificationToken } from "@/lib/tokens";
-import { getVerificationTokenByEmail, getVerificationTokenByToken } from "@/data/verificationToken";
+import { getVerificationTokenByToken } from "@/data/verificationToken";
 import { sendVerificationEmail } from "@/lib/mail";
 import { getResetPassTokenByToken } from "@/data/resetPassToken";
 import { getTwoFactorTokenByToken } from "@/data/twoFactorToken";
@@ -13,7 +13,7 @@ export const resolvers = {
         _empty: () => "Hello World",
     },
     Mutation: {
-        createUser: async (_: any, args: { data: { name: string; email: string; password: string; } }) => {
+        createUser: async (_: unknown, args: { data: { name: string; email: string; password: string; } }) => {
 
             const { name, email, password } = args.data;
 
@@ -58,7 +58,7 @@ export const resolvers = {
                 password: user.password,
             };
         },
-        emailVerification: async (_: any, args: { token: string }) => {
+        emailVerification: async (_: unknown, args: { token: string }) => {
             const { token } = args;
             if (!token) {
                 throw new Error("Token is required for email verification");
@@ -117,7 +117,7 @@ export const resolvers = {
             };
 
         },
-        resetPassword: async (_: any , args: {token: string, data: { newPassword: string , confirmPassword: string }}) => {
+        resetPassword: async (_: unknown , args: {token: string, data: { newPassword: string , confirmPassword: string }}) => {
             
             const { token , data } = args;
             const { newPassword, confirmPassword } = data;
@@ -195,7 +195,7 @@ export const resolvers = {
                 message: "Password reset successfully",
             }
         },
-        twoFactorAuthentication: async(_: any , args: {token: string}) => {
+        twoFactorAuthentication: async(_: unknown , args: {token: string}) => {
             const { token } = args;
             if (!token) {
                 throw new Error("Token is required for 2FA");
@@ -237,6 +237,14 @@ export const resolvers = {
                     isTwoFactorEnabled: true,
                 },
             })
+
+            if(updatedUser){
+                await prisma.twoFactorToken.delete({
+                    where: {
+                        id: twoFactorToken.id,
+                    },
+                })
+            }
 
             return {
                 success: true,

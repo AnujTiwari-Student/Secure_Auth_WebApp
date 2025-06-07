@@ -2,8 +2,9 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import authConfig from "./auth.config"
 import { prisma } from "./prisma"
 import { getUserById, updateUser } from '@/data/user';
-import NextAuth, { type DefaultSession } from "next-auth"
+import NextAuth from "next-auth"
 import { getTwoFactorConfirmationById } from '@/data/twoFactorConfirmation';
+import { getAccountByUserId } from '@/data/getAccountByUserId';
  
 export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig,
@@ -53,20 +54,34 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
             if(session.user) {
                 session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
+                session.user.role = token.role;
+                session.user.name = token.name;
+                session.user.email = token.email;
+                session.user.isOAuth = token.isOAuth;
             }
 
             return session;
         },
         async jwt({token}) {
+
             if(!token.sub) return token;
+
             const user = await getUserById(token.sub);
             if(!user) return token;
-            token.role = user?.role;
+
+            const existingAccount = await getAccountByUserId(user.id);
+
+            token.name = user.name;
+            token.isOAuth = !!existingAccount;
+            token.email = user.email;
+            token.role = user.role;
             token.isTwoFactorEnabled = user?.isTwoFactorEnabled;
+
             return {
                 ...token,
                 user
             };
+
         }
     },
     adapter: PrismaAdapter(prisma),

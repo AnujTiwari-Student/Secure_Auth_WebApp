@@ -12,10 +12,13 @@ type Props = {
     email?: string;
     image?: string;
     id?: string;
+    role?: string
   } | null;
 };
 
 function Navbar({user}: Props) {
+
+    console.log("User in Navbar", user);
     
     const pathname = usePathname();
 
@@ -25,9 +28,11 @@ function Navbar({user}: Props) {
         <Button asChild variant={pathname === "/home" ? "default" : "link"} size="sm" className='flex items-center justify-center p-4'>
             <Link href="/home">Home</Link>
         </Button>
-        <Button asChild variant={pathname === "/admin" ? "default" : "link"} size="sm" className='flex items-center justify-center p-4'>
+        {user?.role === "admin" && (
+          <Button asChild variant={pathname === "/admin" ? "default" : "link"} size="sm" className='flex items-center justify-center p-4'>
             <Link href="/admin">Admin</Link>
-        </Button>
+          </Button>
+        )}
         <Button asChild variant={pathname === "/settings" ? "default" : "link"} size="sm" className='flex items-center justify-center p-4'>
             <Link href="/settings">Settings</Link>
         </Button>
