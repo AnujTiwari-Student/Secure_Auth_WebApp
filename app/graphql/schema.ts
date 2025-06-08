@@ -48,11 +48,16 @@ export const typeDefs = gql`#graphql
     error: String
   }
 
+type UploadResponse {
+  success: Boolean!
+  message: String
+}
+
    type Mutation {
     createUser(data: UserInput!): User!
     emailVerification(token: String!): EmailVerificationResponse!
     resetPassword(token: String! , data: UpdatePasswordInput!): ResetPasswordResponse!
-    twoFactorAuthentication(token: String!): EmailVerificationResponse!
+    uploadAvatar(imageUrl: String!): UploadResponse!
    }
   
   `

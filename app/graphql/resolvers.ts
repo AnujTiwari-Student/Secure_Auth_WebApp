@@ -1,4 +1,4 @@
-import { getUserByEmail } from "@/data/user";
+import { getUserByEmail, getUserById } from "@/data/user";
 import {prisma} from "../../lib/prisma"
 import bcrypt from "bcryptjs";
 import { generateVerificationToken } from "@/lib/tokens";
@@ -6,6 +6,7 @@ import { getVerificationTokenByToken } from "@/data/verificationToken";
 import { sendVerificationEmail } from "@/lib/mail";
 import { getResetPassTokenByToken } from "@/data/resetPassToken";
 import { getTwoFactorTokenByToken } from "@/data/twoFactorToken";
+import { currentUser } from "@/lib/userInfo";
 
 
 export const resolvers = {
@@ -40,7 +41,8 @@ export const resolvers = {
                 throw new Error("Failed to create user");
             }
 
-            const verificationToken = await generateVerificationToken(email);
+            // @ts-ignore
+            const verificationToken = await generateVerificationToken(email , user.id);
                 if (!verificationToken || typeof verificationToken.token !== "string") {
                 console.error("Failed to generate verification token.");
                 return {
@@ -195,61 +197,37 @@ export const resolvers = {
                 message: "Password reset successfully",
             }
         },
-        twoFactorAuthentication: async(_: unknown , args: {token: string}) => {
-            const { token } = args;
-            if (!token) {
-                throw new Error("Token is required for 2FA");
-            }
-            const twoFactorToken = await getTwoFactorTokenByToken(token);
+        uploadAvatar: async (_: unknown, args: { imageUrl: string }) => {
 
-            if (!twoFactorToken) {
-                console.error("Verification token not found");
-                return {
-                    success: false,
-                    error: "Invalid or expired verification token",
-                };
+            console.log("GRAPHQL ENDPOINT HIT");
+            
+            const { imageUrl } = args;
+            console.log("Received image URL:", imageUrl);
+            const existingUser = await currentUser();
+
+            if (!existingUser) {
+                throw new Error("User not authenticated");
             }
 
-            const user = await getUserByEmail(twoFactorToken.email);
+            const user = await getUserById(existingUser.id);
             if (!user) {
-                console.error("User not found.");
-                return {
-                    success: false,
-                    error: "User not found",
-                };
+                throw new Error("User not found");
             }
 
-            const hasExpired = new Date(twoFactorToken.expires) < new Date();
-
-            if (hasExpired) {
-                console.error("Verification token has expired");
-                return {
-                    success: false,
-                    error: "Verification token has expired",
-                };
-            }
-
-            const updatedUser = await prisma.user.update({
+            await prisma.user.update({
                 where: {
                     id: user.id,
                 },
                 data: {
-                    isTwoFactorEnabled: true,
+                    image: imageUrl,
                 },
-            })
-
-            if(updatedUser){
-                await prisma.twoFactorToken.delete({
-                    where: {
-                        id: twoFactorToken.id,
-                    },
-                })
-            }
+            });
 
             return {
                 success: true,
-                message: "2FA mail sent successfully",
-            }   
-        }
+                message: "Avatar uploaded successfully",
+            };
+        },
+
     }
 }

@@ -10,14 +10,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig,
     events: {
         async linkAccount({ user, account, profile }) {
-            console.log("Link Account Event", { user, account, profile });
             const userId = user.id as unknown as string;
             await updateUser(userId);
         }
     },
     callbacks: {
         async signIn({ user, account, profile }) {
-            console.log("Sign In Callback", { user, account, profile });
             if(account?.provider !== "credentials") return true;
             const userId = user.id as unknown as string;
             if(!userId) {
@@ -45,7 +43,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         async session({ session, token }) {
             if(token.sub && session.user){
                 session.user.id = token.sub; 
-                console.log("Session Callback", { session, token });
+                // console.log("Session Callback", { session, token });
             }
 
             if(token.role && session.user) {
@@ -58,6 +56,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
                 session.user.name = token.name;
                 session.user.email = token.email;
                 session.user.isOAuth = token.isOAuth;
+                session.user.image = token.image;
             }
 
             return session;
@@ -72,6 +71,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             const existingAccount = await getAccountByUserId(user.id);
 
             token.name = user.name;
+            token.image = user.image;
             token.isOAuth = !!existingAccount;
             token.email = user.email;
             token.role = user.role;

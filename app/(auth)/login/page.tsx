@@ -61,7 +61,6 @@ export default function Login() {
           }
 
           if (!res?.success || res?.emailVerified === false) {
-            form.reset();
             setError(res?.error || "Something went wrong");
           }
 

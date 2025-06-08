@@ -13,6 +13,7 @@ export const protectedRoutes = [
     "/home",
     "/settings",
     "/profile",
+    "/changePassword",
 ]
 
 export const apiPrefix = "/api/auth";

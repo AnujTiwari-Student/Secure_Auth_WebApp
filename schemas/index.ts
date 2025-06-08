@@ -7,9 +7,18 @@ export const SettingsSchema = z.object({
   isTwoFactorEnabled: z.boolean().optional(),
   email: z.string().email().optional(),
   image: z.string().optional(),
-  password: z.string().optional(),
-  newPassword: z.string().min(8, "Password must be at least 8 characters long").optional(),
   role: z.enum([UserRole.user, UserRole.admin]).optional()
+})
+
+export const ChangePasswordSchema = z.object({
+  password: z.string({
+    message: "Password is required",
+  }),
+  newPassword: z.string({
+    message: "New password is required",
+  }).min(8, {
+    message: "New password must be at least 8 characters long",
+  })
 })
   .refine((data) => {
     if (data.password && !data.newPassword) {
@@ -29,6 +38,7 @@ export const SettingsSchema = z.object({
     message: "Password is required",
     path: ["password"]
   });
+  
 
 export const LoginSchema = z.object({
   email: z.string().email({

@@ -15,7 +15,7 @@ export default async function Home() {
       <p className=""><strong>Email:</strong> {user?.email}</p>
       <p className=""><strong>User ID:</strong> {user?.id}</p>
       <p className=""><strong>Role:</strong> {capitalizeFirstLetter(user?.role)}</p>
-      <p className=""><strong>Image:</strong> {user?.image || "Upload Please"}</p>
+      {/* <p className=""><strong>Image:</strong> {user?.image || "Upload Please"}</p> */}
       <p className=""><strong>2FA:</strong> {user?.isTwoFactorEnabled === true ? "Enabled" : "Disabled"}</p>
     </div>
   )

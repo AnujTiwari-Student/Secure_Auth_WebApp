@@ -18,7 +18,7 @@ type Props = {
 
 function Navbar({user}: Props) {
 
-    console.log("User in Navbar", user);
+    // console.log("User in Navbar", user);
     
     const pathname = usePathname();
 

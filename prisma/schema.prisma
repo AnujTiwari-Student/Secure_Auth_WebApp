@@ -26,6 +26,7 @@ model User {
   role          UserRole @default(user) 
   isTwoFactorEnabled  Boolean @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
+  verificationToken      VerificationToken?
 }
 
 model TwoFactorToken {
@@ -77,11 +78,14 @@ model Thread {
 
 model VerificationToken {
   identifier String @id @default(cuid())
+  userId    String   
+  user      User     @relation(fields: [userId], references: [id])
   email      String
   token      String @unique
   expires    DateTime
 
   @@unique([email, token])
+  @@unique([userId])
 }
 
 model ResetPasswordToken {

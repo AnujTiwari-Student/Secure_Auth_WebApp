@@ -16,7 +16,7 @@ console.log("LoginSchema", LoginSchema);
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
     const validatedFields = LoginSchema.safeParse(values);
-    console.log("Validated fields", validatedFields);
+    // console.log("Validated fields", validatedFields);
 
     if (!validatedFields.success) {
         console.log("Validation errors", validatedFields.error.format());
@@ -31,7 +31,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     const existingUser = await getUserByEmail(email);
 
     if (!existingUser || !existingUser.password || !existingUser.email) {
-        console.log("User not found or missing credentials");
+        // console.log("User not found or missing credentials");
         return {
             success: false,
             error: "Something Went Wrong!",
@@ -40,16 +40,16 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
     if( !existingUser?.emailVerified){
         console.log("Email not verified");
-        const verificationToken = await generateVerificationToken(existingUser?.email || email);
+        const verificationToken = await generateVerificationToken(existingUser?.email || email , existingUser?.id);
         if (!verificationToken || typeof verificationToken.token !== "string") {
-            console.error("Failed to generate verification token.");
+            // console.error("Failed to generate verification token.");
             return {
                 success: false,
                 error: "Failed to generate verification token.",
             };
         }
         await sendVerificationEmail(existingUser.email, verificationToken.token);
-        console.log("Verification token created:", verificationToken);
+        // console.log("Verification token created:", verificationToken);
         return {
             success: false,
             error: "Please verify your email before logging in",
@@ -105,9 +105,6 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
             const twoFactorToken = await generateTwoFactorToken(existingUser.email);
             await sendTwoFactorEmail(twoFactorToken?.email, twoFactorToken?.token);
-
-            console.log("Two factor token created:", twoFactorToken);
-            console.log("twoFactor");
 
             return { success: true , twoFactor: true }
 

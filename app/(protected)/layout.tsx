@@ -1,7 +1,7 @@
 import {currentUser} from "@/lib/userInfo";
 import Navbar from "./_components/Navbar"
 
-  type Props = {
+type Props = {
   children: React.ReactNode;
 };
 

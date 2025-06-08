@@ -1,9 +1,8 @@
 "use server"
 
 import { prisma } from "@/lib/prisma";
-import { getUserByEmail } from "@/data/user";
+import {  getUserById } from "@/data/user";
 import { getVerificationTokenByToken } from "@/data/verificationToken";
-import { redirect } from "next/navigation";
 
 export const verifyEmail = async (token: string) => {
     try {
@@ -18,8 +17,9 @@ export const verifyEmail = async (token: string) => {
             };
         }
 
-        const user = await getUserByEmail(verificationToken.email);
-        if (!user) {
+        const user = await getUserById(verificationToken.userId);
+        
+        if (!user || !user.id) {
             console.error("User not found.");
             return {
                 success: false,

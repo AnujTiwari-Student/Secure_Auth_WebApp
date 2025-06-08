@@ -10,7 +10,7 @@ const ALGORITHM = 'RS256'
 const privateJwk = JSON.parse(process.env.JWT_PRIVATE_KEY!)
 const publicJwk = JSON.parse(process.env.JWT_PUBLIC_KEY!)
 
-export const generateVerificationToken = async (email: string) => {
+export const generateVerificationToken = async (email: string , userId: string) => {
 
     if (!privateJwk || !publicJwk) {
         throw new Error("JWT keys are not defined in the environment variables.");
@@ -50,6 +50,7 @@ export const generateVerificationToken = async (email: string) => {
                 email,
                 token,
                 expires,
+                userId,
             },
         })
 
