@@ -4,6 +4,8 @@ import { resolvers } from '@/app/graphql/resolvers';
 import { typeDefs } from '@/app/graphql/schema';
 import { NextRequest } from 'next/server';
 
+export const runtime = 'nodejs';
+
 const server = new ApolloServer({
   resolvers,
   typeDefs,
