@@ -10,7 +10,19 @@ const server = new ApolloServer({
 });
 
 const handler = startServerAndCreateNextHandler<NextRequest>(server, {
-  context: async () => ({})
+  context: async (req) => {
+    let body;
+    try {
+      body = await req.json();
+    } catch (err) {
+      // Optional: log or handle malformed JSON
+      console.error("Failed to parse body JSON", err);
+    }
+
+    return {
+      body,
+    };
+  },
 });
 
 export async function POST(request: NextRequest) {
