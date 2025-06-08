@@ -6,7 +6,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { redirect } from 'next/navigation';
 import React from 'react'
 
-function page() {
+function Page() {
 
   const user = useCurrentUser();
 
@@ -19,4 +19,4 @@ function page() {
   )
 }
 
-export default page
+export default Page

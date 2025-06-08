@@ -1,18 +1,16 @@
 "use client";
 
-import axios from "axios";
 import { CldUploadWidget, CloudinaryUploadWidgetInfo } from "next-cloudinary";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface AvatarUploaderProps {
-  onSelect: (imageInfo: any) => void;
+  onSelect: (imageInfo: CloudinaryUploadWidgetInfo) => void;
   reset?: boolean
 }
 
 export default function AvatarUploader({onSelect , reset}: AvatarUploaderProps) {
 
-  const [resource, setResource] = useState<CloudinaryUploadWidgetInfo | string>();
+  const [resource, setResource] = useState<CloudinaryUploadWidgetInfo | null>();
 
   useEffect(() => {
     if (reset) {
@@ -28,9 +26,12 @@ export default function AvatarUploader({onSelect , reset}: AvatarUploaderProps) 
     <CldUploadWidget
       uploadPreset="next_authentication_upload"
       onSuccess={(result) => {
+        const info = result?.info;
         console.log("Cloudinary upload result:", result);
-        setResource(result?.info);
-        onSelect(result.info);
+        if (typeof info !== "string" && info) {
+          setResource(info);
+          onSelect(info);
+        }
       }}
     >
       {({ open }) => {
@@ -58,8 +59,7 @@ export default function AvatarUploader({onSelect , reset}: AvatarUploaderProps) 
               />
             </svg>
             <span className="truncate">
-              {/* @ts-ignore */}
-              {resource ? resource.display_name : "Upload Avatar"}
+              {resource ? resource?.display_name : "Upload Avatar"}
             </span>
           </div>
         );

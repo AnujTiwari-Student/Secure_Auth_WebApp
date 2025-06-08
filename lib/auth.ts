@@ -9,13 +9,13 @@ import { getAccountByUserId } from '@/data/getAccountByUserId';
 export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig,
     events: {
-        async linkAccount({ user, account, profile }) {
+        async linkAccount({ user }) {
             const userId = user.id as unknown as string;
             await updateUser(userId);
         }
     },
     callbacks: {
-        async signIn({ user, account, profile }) {
+        async signIn({ user, account }) {
             if(account?.provider !== "credentials") return true;
             const userId = user.id as unknown as string;
             if(!userId) {
@@ -43,7 +43,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         async session({ session, token }) {
             if(token.sub && session.user){
                 session.user.id = token.sub; 
-                // console.log("Session Callback", { session, token });
             }
 
             if(token.role && session.user) {

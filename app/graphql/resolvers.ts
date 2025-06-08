@@ -5,7 +5,6 @@ import { generateVerificationToken } from "@/lib/tokens";
 import { getVerificationTokenByToken } from "@/data/verificationToken";
 import { sendVerificationEmail } from "@/lib/mail";
 import { getResetPassTokenByToken } from "@/data/resetPassToken";
-import { getTwoFactorTokenByToken } from "@/data/twoFactorToken";
 import { currentUser } from "@/lib/userInfo";
 
 
@@ -41,7 +40,6 @@ export const resolvers = {
                 throw new Error("Failed to create user");
             }
 
-            // @ts-ignore
             const verificationToken = await generateVerificationToken(email , user.id);
                 if (!verificationToken || typeof verificationToken.token !== "string") {
                 console.error("Failed to generate verification token.");

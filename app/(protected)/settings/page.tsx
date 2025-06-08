@@ -46,6 +46,16 @@ interface UploadAvatarResponse {
   errors?: Array<{ message: string }>;
 }
 
+export interface SelectedImage {
+  secure_url: string;
+  public_id: string;
+}
+
+interface DeleteImageResponse {
+  success?: string;
+  error?: string;
+}
+
 const SettingPage = () => {
   const user = useCurrentUser();
 
@@ -64,7 +74,7 @@ const SettingPage = () => {
 
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
-  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
   const [resetTrigger, setResetTrigger] = useState(0);
   const [editableFields, setEditableFields] = useState({
     name: false,
@@ -78,8 +88,8 @@ const SettingPage = () => {
 
   const handleDelete = async () => {
     try {
-      const res: any = await axios.post("/api/sign-cloudinary-params", {
-        public_id: selectedImage.public_id,
+      const res = await axios.post<DeleteImageResponse>("/api/sign-cloudinary-params", {
+        public_id: selectedImage?.public_id,
       });
       if (res.data.success) {
         toast.success("Image deleted successfully");
@@ -139,9 +149,10 @@ const SettingPage = () => {
 
           setSelectedImage(null);
         }
-      } catch (err: Error | any) {
-        setError(err.message);
-        toast.error(err.message);
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "Something went wrong";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     });
   };
@@ -298,7 +309,7 @@ const SettingPage = () => {
               <FormField
                 control={form.control}
                 name="image"
-                render={({ field }) => {
+                render={() => {
                   return (
                     <FormItem className="relative">
                       <FormLabel>Profile Image</FormLabel>
