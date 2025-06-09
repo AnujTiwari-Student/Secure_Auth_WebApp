@@ -1,4 +1,5 @@
 import {currentUser} from "@/lib/userInfo";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
 
@@ -7,6 +8,10 @@ export default async function Home() {
   };
 
   const user = await currentUser();
+
+  if(!user){
+    redirect("/login");
+  };
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center">

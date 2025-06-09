@@ -31,7 +31,6 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     const existingUser = await getUserByEmail(email);
 
     if (!existingUser || !existingUser.password || !existingUser.email) {
-        // console.log("User not found or missing credentials");
         return {
             success: false,
             error: "Something Went Wrong!",
