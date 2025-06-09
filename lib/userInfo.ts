@@ -1,10 +1,13 @@
 import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 
 export const currentUser = async () => {
 
     const session = await auth();
-    if(!session?.user) return null
+    if(!session?.user){
+        redirect("/login");
+    }
     return session?.user
 
 }
