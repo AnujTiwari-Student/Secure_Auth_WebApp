@@ -16,7 +16,7 @@ export default function Home() {
           Welcome to AuthApp
         </h1>
         <p className="text-gray-500 mb-6">
-          Secure and Simple Authentication System
+          Login to access your account
         </p>
         <Link href="/login">
           <button className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all">
