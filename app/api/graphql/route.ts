@@ -11,7 +11,13 @@ const server = new ApolloServer({
   typeDefs,
 });
 
-const handler = startServerAndCreateNextHandler<NextRequest>(server);
+const handler = startServerAndCreateNextHandler<NextRequest>(server,{
+  context: async (req) => {
+    return {
+      headers: Object.fromEntries(req.headers),
+    };
+  },
+});
 
 export async function POST(request: NextRequest) {
   return handler(request);
