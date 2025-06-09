@@ -23,8 +23,12 @@ export const resolvers = {
 
             const existingUser = await getUserByEmail(email);
 
-            if (existingUser) {
-                throw new Error("User with this email already exists");
+            if (!existingUser) {
+                return {
+                    success: false,
+                    message: null,
+                    error: "User not authenticated",
+                };
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -204,12 +208,20 @@ export const resolvers = {
             const existingUser = await currentUser();
 
             if (!existingUser) {
-                throw new Error("User not authenticated");
+                return {
+                    success: false,
+                    message: null,
+                    error: "User not authenticated",
+                };
             }
 
             const user = await getUserById(existingUser.id);
             if (!user) {
-                throw new Error("User not found");
+                return {
+                    success: false,
+                    message: null,
+                    error: "User not found",
+                };
             }
 
             await prisma.user.update({
