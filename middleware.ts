@@ -27,9 +27,9 @@ export default auth((req) => {
         return NextResponse.next();
     }
 
-    if( isPublicRoute && isLoggedIn && ["/login", "/signup"].includes(nextUrl.pathname)) {
-        return NextResponse.redirect(new URL(redirectUrl, nextUrl));
-    }
+    // if( isPublicRoute && isLoggedIn && ["/login", "/signup"].includes(nextUrl.pathname)) {
+    //     return NextResponse.redirect(new URL(redirectUrl, nextUrl));
+    // }
 
     if( isProtectedRoute && !isLoggedIn ) {
         console.log("Redirecting to login for public route");
