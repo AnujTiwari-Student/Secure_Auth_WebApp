@@ -5,6 +5,7 @@ import { typeDefs } from '@/app/graphql/schema';
 import { NextRequest } from 'next/server';
 
 export const runtime = 'nodejs';
+export const dynamic = "force-dynamic";
 
 const server = new ApolloServer({
   resolvers,
