@@ -1,14 +1,15 @@
 import { getUserByEmail, getUserById } from "@/data/user";
-import {prisma} from "../../lib/prisma"
+import { prisma } from "../../lib/prisma"
 import bcrypt from "bcryptjs";
 import { generateVerificationToken } from "@/lib/tokens";
 import { getVerificationTokenByToken } from "@/data/verificationToken";
 import { sendVerificationEmail } from "@/lib/mail";
 import { getResetPassTokenByToken } from "@/data/resetPassToken";
 import { currentUser } from "@/lib/userInfo";
+import { IResolvers } from "@graphql-tools/utils";
 
 
-export const resolvers = {
+export const resolvers: IResolvers = {
     Query: {
         _empty: () => "Hello World",
     },
@@ -17,19 +18,16 @@ export const resolvers = {
 
             const { name, email, password } = args.data;
 
-            if(!name || !email || !password){
+            if (!name || !email || !password) {
                 throw new Error("Missing fields");
             }
 
             const existingUser = await getUserByEmail(email);
 
-            if (!existingUser) {
-                return {
-                    success: false,
-                    message: null,
-                    error: "User not authenticated",
-                };
+            if (existingUser) {
+                throw new Error("User with this email already exists.");
             }
+
 
             const hashedPassword = await bcrypt.hash(password, 10);
             const user = await prisma.user.create({
@@ -44,8 +42,8 @@ export const resolvers = {
                 throw new Error("Failed to create user");
             }
 
-            const verificationToken = await generateVerificationToken(email , user.id);
-                if (!verificationToken || typeof verificationToken.token !== "string") {
+            const verificationToken = await generateVerificationToken(email, user.id);
+            if (!verificationToken || typeof verificationToken.token !== "string") {
                 console.error("Failed to generate verification token.");
                 return {
                     success: false,
@@ -55,7 +53,7 @@ export const resolvers = {
             await sendVerificationEmail(user.email, verificationToken.token);
             console.log("Verification token created:", verificationToken);
 
-             return {
+            return {
                 id: user.id,
                 name: user.name,
                 email: user.email,
@@ -88,7 +86,7 @@ export const resolvers = {
 
             const hasExpired = new Date(verificationToken.expires) < new Date();
 
-            if (hasExpired) {   
+            if (hasExpired) {
                 console.error("Verification token has expired");
                 return {
                     success: false,
@@ -102,11 +100,11 @@ export const resolvers = {
                 },
                 data: {
                     emailVerified: new Date(),
-                    email: verificationToken.email, 
+                    email: verificationToken.email,
                 },
             });
 
-            if(updatedUser){
+            if (updatedUser) {
                 await prisma.verificationToken.delete({
                     where: {
                         identifier: verificationToken.identifier,
@@ -118,14 +116,15 @@ export const resolvers = {
                 success: true,
                 message: "Email verified successfully",
                 emailVerified: true,
+                error: null
             };
 
         },
-        resetPassword: async (_: unknown , args: {token: string, data: { newPassword: string , confirmPassword: string }}) => {
-            
-            const { token , data } = args;
+        resetPassword: async (_: unknown, args: { token: string, data: { newPassword: string, confirmPassword: string } }) => {
+
+            const { token, data } = args;
             const { newPassword, confirmPassword } = data;
-            
+
             if (!token) {
                 throw new Error("Token is required for password reset");
             }
@@ -167,7 +166,7 @@ export const resolvers = {
 
             const hasExpired = new Date(resetPassToken.expires) < new Date();
 
-            if (hasExpired) {   
+            if (hasExpired) {
                 console.error("Verification token has expired");
                 return {
                     success: false,
@@ -186,7 +185,7 @@ export const resolvers = {
                 },
             })
 
-            if(updatedUser){
+            if (updatedUser) {
                 await prisma.resetPasswordToken.delete({
                     where: {
                         identifier: resetPassToken.identifier,
@@ -202,7 +201,7 @@ export const resolvers = {
         uploadAvatar: async (_: unknown, args: { imageUrl: string }) => {
 
             console.log("GRAPHQL ENDPOINT HIT");
-            
+
             const { imageUrl } = args;
             console.log("Received image URL:", imageUrl);
             const existingUser = await currentUser();
