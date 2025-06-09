@@ -51,7 +51,7 @@ export const signup = async (values: z.infer<typeof SignupSchema>) => {
         };
     
       try {
-        const response = await axios.post(`http://localhost:3000/api/graphql`, {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/graphql`, {
             query: mutation,
             variables: variables,
             }, {

@@ -48,7 +48,7 @@ const mutation = `
     }
 
     try {
-        const reponse = axios.post(`http://localhost:3000/api/graphql`, {
+        const reponse = axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/graphql`, {
             query: mutation,
             variables: variables,
         }, {
