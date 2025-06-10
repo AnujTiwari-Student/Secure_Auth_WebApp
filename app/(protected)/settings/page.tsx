@@ -67,11 +67,11 @@ const SettingPage = () => {
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
-      name: user.name || undefined,
-      email: user.email || undefined,
-      isTwoFactorEnabled: user.isTwoFactorEnabled || false,
-      image: user.image || undefined,
-      role: user.role || undefined,
+      name: user?.name || undefined,
+      email: user?.email || undefined,
+      isTwoFactorEnabled: user?.isTwoFactorEnabled || false,
+      image: user?.image || undefined,
+      role: user?.role || undefined,
     },
   });
 
