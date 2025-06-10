@@ -12,7 +12,7 @@ import { sendVerificationEmail } from "@/lib/mail";
 export const settings = async (values: z.infer<typeof SettingsSchema>) => {
     
     const user = await currentUser();
-    
+
     if(!user){
         return {
             error: "Unauthorized",
@@ -27,7 +27,7 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
         };
     }
 
-    if(user.isOAuth){
+    if(user?.isOAuth){
         values.email = undefined;
         values.isTwoFactorEnabled = undefined;
     }

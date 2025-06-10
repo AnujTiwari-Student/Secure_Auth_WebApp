@@ -226,7 +226,7 @@ const SettingPage = () => {
                   );
                 }}
               />
-              {!user.isOAuth && (
+              {!user?.isOAuth && (
                 <>
                   <FormField
                     control={form.control}
