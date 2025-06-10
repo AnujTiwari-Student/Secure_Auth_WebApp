@@ -57,7 +57,10 @@ interface DeleteImageResponse {
 }
 
 const SettingPage = () => {
+
   const user = useCurrentUser();
+
+  console.log("user", user);
 
   const {update} = useSession();
 
